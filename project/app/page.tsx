@@ -20,6 +20,9 @@ const INITIAL_VALUES: FormValues = {
 };
 
 export default function Home() {
+
+  console.log("deploy test");   // ← ВОТ СЮДА ВСТАВИТЬ
+
   const [values, setValues] = React.useState<FormValues>(INITIAL_VALUES);
   const [status, setStatus] = React.useState<ResultStatus>('idle');
   const [letter, setLetter] = React.useState('');
