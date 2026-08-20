@@ -2,13 +2,10 @@
 
 import * as React from 'react';
 import { Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LetterForm, FormValues } from '@/components/cover-craft/letter-form';
 import { ResultPanel, ResultStatus } from '@/components/cover-craft/result-panel';
-import { HistoryList } from '@/components/cover-craft/history-list';
 import { generateLetter, reviseLetter } from '@/lib/generate-letter';
-import { supabase, CoverLetterRow } from '@/lib/supabase';
 
 const GENERATION_DELAY_MS = 1400;
 
@@ -21,7 +18,7 @@ const INITIAL_VALUES: FormValues = {
 
 export default function Home() {
 
-  console.log("deploy test");   // ← ВОТ СЮДА ВСТАВИТЬ
+  console.log("deploy test");
 
   const [values, setValues] = React.useState<FormValues>(INITIAL_VALUES);
   const [status, setStatus] = React.useState<ResultStatus>('idle');
@@ -29,53 +26,6 @@ export default function Home() {
   const [feedback, setFeedback] = React.useState('');
   const [isRegenerating, setIsRegenerating] = React.useState(false);
   const [isRevising, setIsRevising] = React.useState(false);
-  const [history, setHistory] = React.useState<CoverLetterRow[]>([]);
-  const [historyLoading, setHistoryLoading] = React.useState(true);
-  const [activeId, setActiveId] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    loadHistory();
-  }, []);
-
-  async function loadHistory() {
-    setHistoryLoading(true);
-    const { data, error } = await supabase
-      .from('cover_letters')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(8);
-
-    if (error) {
-      toast.error('Не удалось загрузить историю');
-      setHistoryLoading(false);
-      return;
-    }
-
-    setHistory(data ?? []);
-    setHistoryLoading(false);
-  }
-
-  async function saveToHistory(input: FormValues, letterText: string) {
-    const { data, error } = await supabase
-      .from('cover_letters')
-      .insert({
-        company_name: input.companyName,
-        job_title: input.jobTitle,
-        experience: input.experience,
-        tone: input.tone,
-        letter: letterText,
-      })
-      .select()
-      .maybeSingle();
-
-    if (error || !data) {
-      toast.error('Письмо создано, но не сохранилось в истории');
-      return;
-    }
-
-    setActiveId(data.id);
-    setHistory((prev) => [data, ...prev].slice(0, 8));
-  }
 
   async function handleGenerate() {
     setStatus('loading');
@@ -84,7 +34,6 @@ export default function Home() {
     const generated = generateLetter(values);
     setLetter(generated);
     setStatus('ready');
-    await saveToHistory(values, generated);
   }
 
   async function handleRegenerate() {
@@ -93,7 +42,6 @@ export default function Home() {
     const generated = generateLetter(values);
     setLetter(generated);
     setIsRegenerating(false);
-    await saveToHistory(values, generated);
   }
 
   async function handleRevise() {
@@ -104,19 +52,6 @@ export default function Home() {
     setLetter(revised);
     setIsRevising(false);
     setFeedback('');
-    await saveToHistory(values, revised);
-  }
-
-  function handleSelectHistory(item: CoverLetterRow) {
-    setValues({
-      companyName: item.company_name,
-      jobTitle: item.job_title,
-      experience: item.experience,
-      tone: item.tone as FormValues['tone'],
-    });
-    setLetter(item.letter);
-    setActiveId(item.id);
-    setStatus('ready');
   }
 
   return (
@@ -158,16 +93,4 @@ export default function Home() {
             isRegenerating={isRegenerating}
           />
         </div>
-
-        <div className="mt-4">
-          <HistoryList
-            items={history}
-            loading={historyLoading}
-            activeId={activeId}
-            onSelect={handleSelectHistory}
-          />
-        </div>
       </main>
-    </div>
-  );
-}
