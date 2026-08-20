@@ -5,7 +5,9 @@ import { Sparkles } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LetterForm, FormValues } from '@/components/cover-craft/letter-form';
 import { ResultPanel, ResultStatus } from '@/components/cover-craft/result-panel';
+import { HistoryList } from '@/components/cover-craft/history-list';
 import { generateLetter, reviseLetter } from '@/lib/generate-letter';
+import { loadHistory, saveToHistory, HistoryItem } from '@/lib/history';
 
 const GENERATION_DELAY_MS = 1400;
 
@@ -27,31 +29,81 @@ export default function Home() {
   const [isRegenerating, setIsRegenerating] = React.useState(false);
   const [isRevising, setIsRevising] = React.useState(false);
 
+  const [history, setHistory] = React.useState<HistoryItem[]>([]);
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+
+  // Загружаем историю при открытии страницы
+  React.useEffect(() => {
+    const items = loadHistory();
+    setHistory(items);
+  }, []);
+
+  // Сохранение письма в историю
+  function addToHistory(input: FormValues, letterText: string) {
+    const item: HistoryItem = {
+      id: crypto.randomUUID(),
+      companyName: input.companyName,
+      jobTitle: input.jobTitle,
+      experience: input.experience,
+      tone: input.tone,
+      letter: letterText,
+      createdAt: Date.now(),
+    };
+
+    saveToHistory(item);
+    setHistory((prev) => [item, ...prev].slice(0, 8));
+    setActiveId(item.id);
+  }
+
   async function handleGenerate() {
     setStatus('loading');
     setFeedback('');
     await new Promise((resolve) => setTimeout(resolve, GENERATION_DELAY_MS));
+
     const generated = generateLetter(values);
     setLetter(generated);
     setStatus('ready');
+
+    addToHistory(values, generated);
   }
 
   async function handleRegenerate() {
     setIsRegenerating(true);
     await new Promise((resolve) => setTimeout(resolve, GENERATION_DELAY_MS));
+
     const generated = generateLetter(values);
     setLetter(generated);
     setIsRegenerating(false);
+
+    addToHistory(values, generated);
   }
 
   async function handleRevise() {
     if (!feedback.trim()) return;
+
     setIsRevising(true);
     await new Promise((resolve) => setTimeout(resolve, GENERATION_DELAY_MS));
+
     const revised = reviseLetter(letter, feedback, values);
     setLetter(revised);
     setIsRevising(false);
     setFeedback('');
+
+    addToHistory(values, revised);
+  }
+
+  // Выбор письма из истории
+  function handleSelectHistory(item: HistoryItem) {
+    setValues({
+      companyName: item.companyName,
+      jobTitle: item.jobTitle,
+      experience: item.experience,
+      tone: item.tone as FormValues['tone'],
+    });
+
+    setLetter(item.letter);
+    setActiveId(item.id);
+    setStatus('ready');
   }
 
   return (
@@ -81,6 +133,7 @@ export default function Home() {
             onSubmit={handleGenerate}
             isGenerating={status === 'loading'}
           />
+
           <ResultPanel
             status={status}
             letter={letter}
@@ -91,6 +144,14 @@ export default function Home() {
             onRevise={handleRevise}
             isRevising={isRevising}
             isRegenerating={isRegenerating}
+          />
+        </div>
+
+        <div className="mt-4">
+          <HistoryList
+            items={history}
+            activeId={activeId}
+            onSelect={handleSelectHistory}
           />
         </div>
       </main>
