@@ -7,9 +7,13 @@ interface Props {
   items: HistoryItem[];
   activeId: string | null;
   onSelect: (item: HistoryItem) => void;
+  visibleCount: number;
+  onShowMore: () => void;
 }
 
-export function HistoryList({ items, activeId, onSelect }: Props) {
+export function HistoryList({ items, activeId, onSelect, visibleCount, onShowMore }: Props) {
+  const visibleItems = items.slice(0, visibleCount);
+
   if (!items.length) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -20,7 +24,7 @@ export function HistoryList({ items, activeId, onSelect }: Props) {
 
   return (
     <div className="grid gap-2">
-      {items.map((item) => (
+      {visibleItems.map((item) => (
         <button
           key={item.id}
           onClick={() => onSelect(item)}
@@ -32,6 +36,15 @@ export function HistoryList({ items, activeId, onSelect }: Props) {
           <p className="text-xs text-muted-foreground">{item.jobTitle}</p>
         </button>
       ))}
+
+      {visibleCount < items.length && (
+        <button
+          onClick={onShowMore}
+          className="text-sm text-primary hover:underline mt-2"
+        >
+          Показать ещё
+        </button>
+      )}
     </div>
   );
 }

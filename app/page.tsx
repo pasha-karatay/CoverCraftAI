@@ -32,13 +32,21 @@ export default function Home() {
   const [history, setHistory] = React.useState<HistoryItem[]>([]);
   const [activeId, setActiveId] = React.useState<string | null>(null);
 
-  // Загружаем историю при открытии страницы
+  // сколько показывать
+  const [visibleCount, setVisibleCount] = React.useState(8);
+
+  // загрузка истории
   React.useEffect(() => {
     const items = loadHistory();
     setHistory(items);
   }, []);
 
-  // Сохранение письма в историю
+  // показать ещё
+  function handleShowMore() {
+    setVisibleCount((prev) => prev + 8);
+  }
+
+  // сохранить письмо
   function addToHistory(input: FormValues, letterText: string) {
     const item: HistoryItem = {
       id: crypto.randomUUID(),
@@ -51,7 +59,7 @@ export default function Home() {
     };
 
     saveToHistory(item);
-    setHistory((prev) => [item, ...prev].slice(0, 8));
+    setHistory((prev) => [item, ...prev]);
     setActiveId(item.id);
   }
 
@@ -92,7 +100,7 @@ export default function Home() {
     addToHistory(values, revised);
   }
 
-  // Выбор письма из истории
+  // выбор письма из истории
   function handleSelectHistory(item: HistoryItem) {
     setValues({
       companyName: item.companyName,
@@ -152,6 +160,8 @@ export default function Home() {
             items={history}
             activeId={activeId}
             onSelect={handleSelectHistory}
+            visibleCount={visibleCount}
+            onShowMore={handleShowMore}
           />
         </div>
       </main>
