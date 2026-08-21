@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { askGroq } from "@/lib/groq";
 
 export async function POST(req: Request) {
-  const { companyName, jobTitle, experience, tone } = await req.json();
+  try {
+    const { companyName, jobTitle, experience, tone } = await req.json();
 
   const prompt = `
 Сгенерируй сопроводительное письмо для вакансии ${jobTitle} в компании ${companyName}.
@@ -10,20 +12,12 @@ export async function POST(req: Request) {
 Стиль: кратко, структурировано, профессионально, без воды.
 `;
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
+    const text = await askGroq([{ role: "user", content: prompt }]);
 
-  const data = await response.json();
-  const text = data.choices[0].message.content;
-
-  return NextResponse.json({ text });
+    return NextResponse.json({ text });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Ошибка при обращении к Groq";
+    console.error("Ошибка API:", message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
