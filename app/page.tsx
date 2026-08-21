@@ -68,7 +68,7 @@ export default function Home() {
     setFeedback('');
     await new Promise((resolve) => setTimeout(resolve, GENERATION_DELAY_MS));
 
-    const generated = generateLetter(values);
+    const generated = await generateLetter(values);
     setLetter(generated);
     setStatus('ready');
 
@@ -92,7 +92,7 @@ export default function Home() {
     setIsRevising(true);
     await new Promise((resolve) => setTimeout(resolve, GENERATION_DELAY_MS));
 
-    const revised = reviseLetter(letter, feedback, values);
+    const revised = await reviseLetter(letter, feedback, values);
     setLetter(revised);
     setIsRevising(false);
     setFeedback('');
