@@ -20,6 +20,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
+  const [error, setError] = useState('');
 
   const [history, setHistory] = useState<
     { values: FormValues; letter: string; date: string }[]
@@ -35,23 +36,33 @@ export default function Home() {
   // 🔥 Генерация письма
   async function handleGenerate() {
     setIsGenerating(true);
+    setError('');
 
-    const generated = await generateLetter(values);
-    setLetter(generated);
-
-    setIsGenerating(false);
-    addToHistory(values, generated);
+    try {
+      const generated = await generateLetter(values);
+      setLetter(generated);
+      addToHistory(values, generated);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Не удалось сгенерировать письмо');
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   // 🔥 Перегенерация письма
   async function handleRegenerate() {
     setIsRegenerating(true);
+    setError('');
 
-    const generated = await generateLetter(values);
-    setLetter(generated);
-
-    setIsRegenerating(false);
-    addToHistory(values, generated);
+    try {
+      const generated = await generateLetter(values);
+      setLetter(generated);
+      addToHistory(values, generated);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Не удалось сгенерировать письмо');
+    } finally {
+      setIsRegenerating(false);
+    }
   }
 
   // 🔥 Ревизия письма по пожеланиям
@@ -59,12 +70,17 @@ export default function Home() {
     if (!letter.trim() || !feedback.trim()) return;
 
     setIsRevising(true);
+    setError('');
 
-    const revised = await reviseLetter(letter, feedback, values);
-    setLetter(revised);
-
-    setIsRevising(false);
-    addToHistory(values, revised);
+    try {
+      const revised = await reviseLetter(letter, feedback, values);
+      setLetter(revised);
+      addToHistory(values, revised);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Не удалось изменить письмо');
+    } finally {
+      setIsRevising(false);
+    }
   }
 
   return (
@@ -92,6 +108,8 @@ export default function Home() {
           {isGenerating && (
             <p className="text-muted-foreground">Генерирую письмо...</p>
           )}
+
+          {error && <p className="text-red-500">{error}</p>}
 
           {/* Письмо */}
           {letter && (
