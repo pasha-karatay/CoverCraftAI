@@ -1,6 +1,15 @@
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'openai/gpt-oss-120b';
 
+function removeInventedContacts(text: string) {
+  return text
+    .replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, '')
+    .replace(/(?:\+?\d[\d\s().-]{7,}\d)/g, '')
+    .replace(/\n\s*[-*]?\s*(?:телефон|phone|email|e-mail|адрес)\s*:\s*[^\n]*/gi, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 type GroqMessage = {
   role: 'user' | 'system';
   content: string;
@@ -37,5 +46,5 @@ export async function askGroq(messages: GroqMessage[]) {
     throw new Error('Groq не вернул текстовый ответ');
   }
 
-  return text;
+  return removeInventedContacts(text);
 }
