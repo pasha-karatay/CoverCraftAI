@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
-import { LetterTone, TONE_LABELS } from '@/lib/generate-letter';
+import { LetterTone } from '@/lib/generate-letter';
 
 export interface FormValues {
   companyName: string;
@@ -30,41 +30,50 @@ const TONE_ICONS: Record<LetterTone, typeof Briefcase> = {
   creative: Sparkles,
 };
 
+// 🔥 Новые реальные примеры
 export const EXAMPLES: LetterExample[] = [
   {
-    label: 'Frontend-разработчик',
-    description: 'TechFlow · React, TypeScript',
+    label: 'Junior Frontend',
+    description: 'React · TypeScript · UI',
     values: {
-      companyName: 'TechFlow',
-      jobTitle: 'Frontend-разработчик',
+      companyName: 'WebNova',
+      jobTitle: 'Junior Frontend Developer',
       experience:
-        '3 года разрабатываю интерфейсы на React и TypeScript. Переписал ключевой модуль приложения, ускорив загрузку страниц на 40%. Руководил командой из 4 разработчиков и внедрил code review как обязательный процесс.',
+        'Полгода изучаю React и TypeScript, сделал несколько пет-проектов, включая лендинги и небольшие SPA. Умею работать с компонентами, хуками, Tailwind и понимаю основы UX.',
       tone: 'professional',
     },
   },
   {
-    label: 'Маркетолог',
-    description: 'BrightMedia · digital-маркетинг',
+    label: 'Контент-менеджер',
+    description: 'SMM · копирайтинг',
     values: {
-      companyName: 'BrightMedia',
-      jobTitle: 'Маркетолог',
+      companyName: 'MediaPulse',
+      jobTitle: 'Контент-менеджер',
       experience:
-        '4 года веду digital-кампании для B2C брендов. Увеличил органический трафик на 65% за год и запустил email-рассылку с открываемостью 38%. Люблю тестировать гипотезы и считать цифры.',
+        'Создаю тексты для соцсетей и блогов, умею работать с визуалом, делаю аккуратные карточки и посты. Понимаю основы SMM и умею адаптировать стиль под аудиторию.',
       tone: 'friendly',
     },
   },
   {
-    label: 'Менеджер проектов',
-    description: 'Orbit Logistics · управление командами',
+    label: 'Помощник менеджера',
+    description: 'Организация · коммуникации',
     values: {
-      companyName: 'Orbit Logistics',
-      jobTitle: 'Менеджер проектов',
+      companyName: 'LogiCore',
+      jobTitle: 'Помощник менеджера',
       experience:
-        '5 лет управляю проектами в логистике с бюджетом до 10 млн рублей. Внедрил Scrum в команде из 12 человек и сократил сроки поставки на 20%. Умею находить общий язык и с разработчиками, и с заказчиками.',
+        'Организовывал встречи, помогал с документацией, общался с клиентами и решал операционные задачи. Умею работать в команде, быстро адаптируюсь и люблю порядок.',
       tone: 'confident',
     },
   },
 ];
+
+// 🔥 Локальные названия тонов
+const TONE_LABELS: Record<LetterTone, string> = {
+  professional: "Профессиональный",
+  friendly: "Дружелюбный",
+  confident: "Уверенный",
+  creative: "Креативный",
+};
 
 interface LetterFormProps {
   values: FormValues;
@@ -90,7 +99,7 @@ export function LetterForm({ values, onChange, onSubmit, isGenerating }: LetterF
               <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="company"
-                placeholder="Например: TechFlow"
+                placeholder="Например: WebNova"
                 className="pl-9"
                 value={values.companyName}
                 onChange={(e) => onChange({ ...values, companyName: e.target.value })}
@@ -103,7 +112,7 @@ export function LetterForm({ values, onChange, onSubmit, isGenerating }: LetterF
               <Briefcase className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="role"
-                placeholder="Например: Frontend-разработчик"
+                placeholder="Например: Junior Frontend Developer"
                 className="pl-9"
                 value={values.jobTitle}
                 onChange={(e) => onChange({ ...values, jobTitle: e.target.value })}
@@ -116,7 +125,7 @@ export function LetterForm({ values, onChange, onSubmit, isGenerating }: LetterF
           <Label htmlFor="experience">Ваш опыт и ключевые навыки</Label>
           <Textarea
             id="experience"
-            placeholder="Например: 3 года работал frontend-разработчиком, специализируюсь на React и TypeScript, руководил командой из 4 человек, увеличил скорость загрузки сайта на 40%..."
+            placeholder="Например: сделал несколько пет-проектов на React, понимаю основы TypeScript..."
             className="min-h-[140px] resize-none"
             value={values.experience}
             onChange={(e) => onChange({ ...values, experience: e.target.value })}
