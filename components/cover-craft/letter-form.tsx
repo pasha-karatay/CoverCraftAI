@@ -8,7 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
-import { LetterTone } from '@/lib/generate-letter';
+
+// 🔥 Локальный тип тона письма (раньше импортировался — теперь здесь)
+export type LetterTone = 'professional' | 'friendly' | 'confident' | 'creative';
 
 export interface FormValues {
   companyName: string;

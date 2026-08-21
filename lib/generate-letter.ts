@@ -1,4 +1,4 @@
-export async function generateLetter(values) {
+export async function generateLetter(values: any) {
   const res = await fetch("/api/generate", {
     method: "POST",
     headers: {
@@ -11,7 +11,7 @@ export async function generateLetter(values) {
   return data.text;
 }
 
-export async function reviseLetter(letter, feedback, values) {
+export async function reviseLetter(letter: string, feedback: string, values: any) {
   const res = await fetch("/api/revise", {
     method: "POST",
     headers: {
