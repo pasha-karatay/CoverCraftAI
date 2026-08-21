@@ -6,6 +6,7 @@ import { generateLetter, reviseLetter } from '@/lib/generate-letter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 export default function Home() {
   const [values, setValues] = useState<FormValues>({
@@ -42,8 +43,11 @@ export default function Home() {
       const generated = await generateLetter(values);
       setLetter(generated);
       addToHistory(values, generated);
+      toast.success('Письмо готово');
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Не удалось сгенерировать письмо');
+      const message = error instanceof Error ? error.message : 'Не удалось сгенерировать письмо';
+      setError(message);
+      toast.error('Не удалось сгенерировать письмо', { description: message });
     } finally {
       setIsGenerating(false);
     }
@@ -58,8 +62,11 @@ export default function Home() {
       const generated = await generateLetter(values);
       setLetter(generated);
       addToHistory(values, generated);
+      toast.success('Письмо обновлено');
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Не удалось сгенерировать письмо');
+      const message = error instanceof Error ? error.message : 'Не удалось сгенерировать письмо';
+      setError(message);
+      toast.error('Не удалось обновить письмо', { description: message });
     } finally {
       setIsRegenerating(false);
     }
@@ -76,15 +83,18 @@ export default function Home() {
       const revised = await reviseLetter(letter, feedback, values);
       setLetter(revised);
       addToHistory(values, revised);
+      toast.success('Письмо переработано');
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Не удалось изменить письмо');
+      const message = error instanceof Error ? error.message : 'Не удалось изменить письмо';
+      setError(message);
+      toast.error('Не удалось переработать письмо', { description: message });
     } finally {
       setIsRevising(false);
     }
   }
 
   return (
-    <div className="container mx-auto grid gap-6 py-10 lg:grid-cols-2">
+    <div className="container mx-auto grid animate-page-in gap-6 py-10 lg:grid-cols-2">
       {/* Левая колонка — форма */}
       <LetterForm
         values={values}
@@ -94,7 +104,7 @@ export default function Home() {
       />
 
       {/* Правая колонка — результат */}
-      <Card className="border-border/60 shadow-sm">
+      <Card className="animate-rise border-border/60 shadow-sm [animation-delay:120ms]">
         <CardHeader>
           <CardTitle>Ваше письмо</CardTitle>
         </CardHeader>
@@ -143,7 +153,7 @@ export default function Home() {
       </Card>
 
       {/* История */}
-      <Card className="lg:col-span-2 border-border/60 shadow-sm">
+      <Card className="animate-rise lg:col-span-2 border-border/60 shadow-sm [animation-delay:240ms]">
         <CardHeader>
           <CardTitle>История</CardTitle>
         </CardHeader>

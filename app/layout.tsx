@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: 'CoverCraft AI — Сопроводительные письма за 15 секунд',
   description:
     'CoverCraft AI генерирует персональные сопроводительные письма за 15 секунд на основе вашего опыта и вакансии.',
+  icons: {
+    icon: '/icon.svg',
+  },
   openGraph: {
     images: [
       {
